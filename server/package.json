@@ -1,0 +1,26 @@
+{
+  "name": "whatsapp-crm-server",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js --watch src",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.1.4",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.8.0",
+    "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "nanoid": "^4.0.0",
+    "mongoose": "^7.4.0",
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
