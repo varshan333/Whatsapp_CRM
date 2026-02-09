@@ -1,0 +1,77 @@
+@import 'tailwindcss';
+
+:root {
+  /* Brand colors */
+  --color-primary: #0f9d58;
+  --color-primary-dark: #0d7f48;
+  --color-primary-light: #e6f7f0;
+
+  /* Neutral colors */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+
+  /* Semantic colors */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter);
+}
+
+/* Global typography */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900;
+}
+
+/* Focus styles for accessibility */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  @apply outline-none ring-2 ring-[#0F9D58] ring-offset-2;
+}
+
+/* Smooth transitions */
+* {
+  @apply transition-colors duration-200;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  @apply transition-all duration-200;
+}
+
+/* Remove default button styles */
+button {
+  font-family: inherit;
+}
+
+/* Utility classes */
+.prose {
+  @apply text-slate-600 leading-relaxed;
+}
+
+.prose strong {
+  @apply text-slate-900;
+}
