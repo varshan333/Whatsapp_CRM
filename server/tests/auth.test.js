@@ -2,9 +2,11 @@ const request = require('supertest');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const mongoose = require('mongoose');
 let app;
+let _mongod;
 
 beforeAll(async () => {
   const mongod = await MongoMemoryServer.create();
+  _mongod = mongod;
   const uri = mongod.getUri();
   process.env.MONGODB_URI = uri;
   // connect DB and require app
@@ -15,6 +17,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await mongoose.disconnect();
+  if (_mongod) await _mongod.stop();
   // close redis if present
   try {
     const redis = require('../src/redis');
