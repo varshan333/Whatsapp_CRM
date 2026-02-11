@@ -63,7 +63,12 @@ This section documents the concrete backend work completed during the latest upd
 - Implemented authentication middleware and role-based authorization middleware (`server/src/middleware/auth.js`).
 - Added Redis connection (`server/src/redis.js`) and a simple Redis-backed queue (`server/src/queue.js`).
 - Added a WhatsApp provider scaffold for template sending (`server/src/providers/whatsapp.js`) with a best-effort send implementation. (Needs credentials and verification for production.)
-- Implemented webhook endpoint to receive incoming provider events and enqueue them for processing: `POST /webhook/incoming` (`server/src/routes/webhook.js`).
+- Implemented webhook endpoint to receive incoming provider events and process provider delivery/read receipts. The webhook now:
+  - recognizes common provider shapes (Meta-style `entry[].changes[].value.statuses`, `messages` arrays, or top-level status arrays),
+  - maps provider status strings to the internal enum (`sent`, `delivered`, `read`, `failed`, `unknown`),
+  - finds the local `Message` by `providerMessageId`, updates `Message.status` idempotently, and appends a `{ status, timestamp, raw }` entry to `Message.statusHistory` for auditability,
+  - continues to enqueue non-status inbound messages for async processing.
+  Endpoint: `POST /webhook/incoming` (`server/src/routes/webhook.js`).
 - Implemented outbound enqueue + immediate best-effort send flow for template messages: `POST /api/messages/template` (`server/src/routes/messages.js`).
 - Added CRUD endpoints (secure) for core resources:
   - Leads: `server/src/routes/leads.js` (create/list/get/update/delete)
@@ -73,6 +78,7 @@ This section documents the concrete backend work completed during the latest upd
   - Clients: `server/src/routes/clients.js` (create/list)
   - Users: `server/src/routes/users.js` (create/list for admins)
 - Added DB indexes and a TTL index for refresh tokens in `server/src/models.js` to improve query performance and to auto-clean rotated tokens.
+- Extended `Message` model with `providerMessageId` (indexed) and `statusHistory` (array of `{status,timestamp,raw}`) to support provider receipt tracking and idempotent updates (`server/src/models.js`).
 - Mounted routes and added a simple background worker in `server/src/index.js` which consumes the outbound queue and calls the provider scaffold.
 - Added test scaffolding and one integration test for auth (signup/login) using Jest + supertest + mongodb-memory-server (`server/tests/auth.test.js`, `server/jest.config.js`).
 
@@ -81,7 +87,6 @@ This section documents the concrete backend work completed during the latest upd
 - WhatsApp provider integration: scaffolded and able to POST template messages, but
   - signature verification (`verifySignature`) is a placeholder and must be implemented using provider HMAC or verification header rules;
   - retry/backoff and robust error handling need production hardening.
-- Message status tracking: the `Message` model includes `status`, but webhook handlers to map provider delivery receipts to the Message documents are not yet implemented.
 - Inbound webhook processing: webhook events are enqueued; the worker does not yet convert inbound payloads into Lead/Conversation/Message records (that logic needs to be implemented in the worker).
 - Tenant enforcement: `clientId` fields exist, but there is not yet global middleware that resolves the request's tenant and enforces filtering for every endpoint.
 

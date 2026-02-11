@@ -61,7 +61,17 @@ const MessageSchema = new Schema({
   messageType: { type: String, enum: ['text', 'template', 'image', 'button'] },
   content: Schema.Types.Mixed,
   templateName: String,
-  status: { type: String, enum: ['sent', 'delivered', 'failed'], default: 'sent' },
+  // providerMessageId stores the external provider's message id (e.g., WhatsApp message id)
+  providerMessageId: { type: String, index: true },
+  status: { type: String, enum: ['sent', 'delivered', 'failed', 'read', 'unknown'], default: 'sent' },
+  // history of status updates from provider (idempotent append)
+  statusHistory: [
+    {
+      status: String,
+      timestamp: Date,
+      raw: Schema.Types.Mixed,
+    },
+  ],
   timestamp: { type: Date, default: Date.now },
 });
 MessageSchema.index({ conversationId: 1, timestamp: -1 });
