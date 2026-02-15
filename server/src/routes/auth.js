@@ -17,7 +17,7 @@ const REFRESH_EXPIRES = process.env.REFRESH_TOKEN_EXPIRY || '7d';
 const signupSchema = z.object({
   fullName: z.string().min(2),
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z.string().min(6),
   agreeToTerms: z.boolean(),
 });
 

@@ -5,6 +5,7 @@ const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
+const webhookRoutes = require('./routes/webhook');
 const db = require('./db');
 
 const app = express();
@@ -17,6 +18,7 @@ const limiter = rateLimit({ windowMs: 60 * 1000, max: 120 });
 app.use(limiter);
 
 app.use('/api/auth', authRoutes);
+app.use('/webhook', webhookRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 

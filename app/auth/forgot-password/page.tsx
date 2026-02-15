@@ -34,9 +34,7 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Replace with your actual API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log('Password reset requested for:', { email });
+      await import('../../lib/api').then(({ auth }) => auth.requestPassword?.({ email }) || Promise.resolve());
       setIsSubmitted(true);
     } catch (error) {
       setErrors({ email: 'Failed to send reset link. Please try again.' });

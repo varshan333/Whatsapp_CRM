@@ -88,13 +88,11 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Replace with your actual API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log('Signup attempt:', {
-        fullName: formData.fullName,
-        email: formData.email,
-      });
-      setIsSubmitted(true);
+      await import('../../lib/api').then(({ auth }) =>
+        auth.signup({ fullName: formData.fullName, email: formData.email, password: formData.password, agreeToTerms: formData.agreeToTerms })
+      );
+      // On success redirect to dashboard
+      window.location.href = '/dashboard';
     } catch (error) {
       setErrors({ email: 'Signup failed. Please try again.' });
     } finally {

@@ -41,12 +41,12 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Replace with your actual API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log('Login attempt:', { email, password });
-      // Handle successful login (redirect to dashboard, set auth token, etc.)
+      // Call backend API
+      await import('../../lib/api').then(({ auth }) => auth.login({ email, password }));
+      // Redirect to dashboard after login
+      window.location.href = '/dashboard';
     } catch (error) {
-      setErrors({ email: 'Login failed. Please try again.' });
+      setErrors({ email: String((error as Error).message || 'Login failed. Please try again.') });
     } finally {
       setIsLoading(false);
     }
