@@ -18,11 +18,20 @@ const UserSchema = new Schema({
   name: String,
   email: { type: String, required: true, unique: true },
   passwordHash: String,
-  role: { type: String, enum: ["admin", "agent"], default: "agent" },
+  role: { type: String, enum: ["Admin", "Agent"], default: "Agent" },
   status: { type: String, enum: ["active", "disabled"], default: "active" },
   createdAt: { type: Date, default: Date.now },
 });
 UserSchema.index({ email: 1 });
+
+// Provide a `fullName` virtual so APIs can return `fullName` to the frontend
+UserSchema.virtual("fullName").get(function (this: any) {
+  return this.name || "";
+});
+
+// Include virtuals in JSON / Object output
+UserSchema.set("toJSON", { virtuals: true });
+UserSchema.set("toObject", { virtuals: true });
 
 const RefreshTokenSchema = new Schema({
   tokenId: { type: String, required: true, unique: true },
@@ -63,9 +72,27 @@ const ConversationSchema = new Schema({
     default: "open",
   },
   lastMessageAt: Date,
+  displayName: String,
+  avatar: String,
+  lastMessagePreview: String,
+  unreadCount: { type: Number, default: 0 },
+  frontendStatus: {
+    type: String,
+    enum: ["unread", "read", "resolved"],
+    default: "unread",
+  },
+  starred: { type: Boolean, default: false },
+  userMeta: [
+    {
+      userId: { type: Schema.Types.ObjectId, ref: "User" },
+      starred: { type: Boolean, default: false },
+      lastReadAt: Date,
+    },
+  ],
   createdAt: { type: Date, default: Date.now },
 });
 ConversationSchema.index({ clientId: 1, status: 1, lastMessageAt: -1 });
+ConversationSchema.index({ clientId: 1, frontendStatus: 1 });
 
 const MessageSchema = new Schema({
   clientId: { type: Schema.Types.ObjectId, ref: "Client" },
@@ -74,14 +101,12 @@ const MessageSchema = new Schema({
   messageType: { type: String, enum: ["text", "template", "image", "button"] },
   content: Schema.Types.Mixed,
   templateName: String,
-  // providerMessageId stores the external provider's message id (e.g., WhatsApp message id)
   providerMessageId: { type: String, index: true },
   status: {
     type: String,
     enum: ["sent", "delivered", "failed", "read", "unknown"],
     default: "sent",
   },
-  // history of status updates from provider (idempotent append)
   statusHistory: [
     {
       status: String,
@@ -107,6 +132,107 @@ const TemplateSchema = new Schema({
   createdAt: { type: Date, default: Date.now },
 });
 TemplateSchema.index({ clientId: 1, name: 1 });
+
+// Campaigns - extended with metrics and segment breakdown
+const CampaignSchema = new Schema({
+  clientId: { type: Schema.Types.ObjectId, ref: "Client" },
+  name: String,
+  templateId: { type: Schema.Types.ObjectId, ref: "Template" },
+  targetTags: [String],
+  // Scheduling
+  scheduleTime: Date,
+  startDate: Date,
+  endDate: Date,
+  status: {
+    type: String,
+    enum: ["scheduled", "running", "paused", "completed"],
+    default: "scheduled",
+  },
+  createdAt: { type: Date, default: Date.now },
+
+  // Metrics
+  audienceSize: { type: Number, default: 0 },
+  messagesSent: { type: Number, default: 0 },
+  delivered: { type: Number, default: 0 },
+  read: { type: Number, default: 0 },
+  clicked: { type: Number, default: 0 },
+  replied: { type: Number, default: 0 },
+  conversions: { type: Number, default: 0 },
+
+  // Rates stored as percentages (0-100)
+  rates: {
+    deliveryRate: { type: Number, default: 0 },
+    readRate: { type: Number, default: 0 },
+    clickRate: { type: Number, default: 0 },
+    replyRate: { type: Number, default: 0 },
+    conversionRate: { type: Number, default: 0 },
+  },
+
+  // Segment breakdowns - use Maps so keys can be dynamic (e.g., location names)
+  segmentBreakdown: {
+    location: { type: Map, of: Number, default: {} },
+    age_group: { type: Map, of: Number, default: {} },
+  },
+});
+CampaignSchema.index({ clientId: 1, createdAt: -1 });
+
+// Campaign Logs
+const CampaignLogSchema = new Schema({
+  campaignId: { type: Schema.Types.ObjectId, ref: "Campaign" },
+  leadId: { type: Schema.Types.ObjectId, ref: "Lead" },
+  messageStatus: { type: String, enum: ["sent", "delivered", "failed"] },
+  sentAt: { type: Date, default: Date.now },
+});
+CampaignLogSchema.index({ campaignId: 1, leadId: 1 });
+
+// Automation rules
+const AutomationRuleSchema = new Schema({
+  clientId: { type: Schema.Types.ObjectId, ref: "Client" },
+  triggerType: { type: String, enum: ["keyword", "menu", "status"] },
+  triggerValue: String,
+  templateId: { type: Schema.Types.ObjectId, ref: "Template" },
+  businessHoursOnly: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now },
+});
+AutomationRuleSchema.index({ clientId: 1, triggerType: 1 });
+
+// Tasks
+const TaskSchema = new Schema({
+  clientId: { type: Schema.Types.ObjectId, ref: "Client" },
+  leadId: { type: Schema.Types.ObjectId, ref: "Lead" },
+  assignedAgentId: { type: Schema.Types.ObjectId, ref: "User" },
+  title: String,
+  dueDate: Date,
+  priority: {
+    type: String,
+    enum: ["low", "medium", "high"],
+    default: "medium",
+  },
+  status: { type: String, enum: ["pending", "completed"], default: "pending" },
+  createdAt: { type: Date, default: Date.now },
+});
+TaskSchema.index({ clientId: 1, assignedAgentId: 1, status: 1 });
+
+// AI Logs
+const AiLogSchema = new Schema({
+  clientId: { type: Schema.Types.ObjectId, ref: "Client" },
+  featureType: { type: String, enum: ["template", "summary", "error"] },
+  input: Schema.Types.Mixed,
+  output: Schema.Types.Mixed,
+  createdAt: { type: Date, default: Date.now },
+});
+AiLogSchema.index({ clientId: 1, createdAt: -1 });
+
+// Audit logs
+const AuditLogSchema = new Schema({
+  clientId: { type: Schema.Types.ObjectId, ref: "Client" },
+  userId: { type: Schema.Types.ObjectId, ref: "User" },
+  action: String,
+  entityType: String,
+  entityId: Schema.Types.Mixed,
+  timestamp: { type: Date, default: Date.now },
+});
+AuditLogSchema.index({ clientId: 1, userId: 1, timestamp: -1 });
 
 // Check if models are already defined to prevent overwriting in hot reload
 export const Client =
