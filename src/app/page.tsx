@@ -50,13 +50,13 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-3">
             <Link
-              href="/auth/login"
+              href="/login"
               className="text-slate-700 hover:text-slate-900 font-medium transition-colors"
             >
               Sign in
             </Link>
             <Link
-              href="/auth/signup"
+              href="/signup"
               className="bg-[#0F9D58] hover:bg-[#0D7F48] text-white font-medium px-4 py-2 rounded-lg transition-colors"
             >
               Get started
@@ -80,7 +80,7 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Link
-              href="/auth/signup"
+              href="/signup"
               aria-label="Get started with WhatsApp CRM"
               className="inline-flex items-center justify-center gap-2 bg-[#0F9D58] hover:bg-[#0D7F48] text-white font-semibold px-8 py-4 rounded-lg transition-all shadow-md hover:shadow-lg"
             >
@@ -89,7 +89,7 @@ export default function Home() {
             </Link>
 
             <Link
-              href="/auth/login"
+              href="/login"
               className="inline-flex items-center justify-center gap-2 border-2 border-slate-300 hover:border-[#0F9D58] text-slate-700 hover:text-[#0F9D58] font-semibold px-8 py-4 rounded-lg transition-all"
             >
               Sign in

@@ -98,21 +98,21 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: formData.fullName,
-          email: formData.email,
-          password: formData.password,
-          agreeToTerms: formData.agreeToTerms,
-        }),
-      });
+      // const res = await fetch("/api/auth/signup", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({
+      //     fullName: formData.fullName,
+      //     email: formData.email,
+      //     password: formData.password,
+      //     agreeToTerms: formData.agreeToTerms,
+      //   }),
+      // });
 
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || res.statusText || "Signup failed");
-      }
+      // if (!res.ok) {
+      //   const errorData = await res.json().catch(() => ({}));
+      //   throw new Error(errorData.message || res.statusText || "Signup failed");
+      // }
       // On success redirect to dashboard
       window.location.href = "/dashboard";
     } catch (_error) {
@@ -421,7 +421,7 @@ export default function SignupPage() {
               <p className="text-center text-sm text-slate-600 mt-6">
                 Already have an account?{" "}
                 <Link
-                  href="/auth/login"
+                  href="/login"
                   className="text-[#0F9D58] hover:text-[#0D7F48] font-semibold transition-colors"
                 >
                   Sign in
@@ -463,7 +463,7 @@ export default function SignupPage() {
                 </div>
 
                 <Link
-                  href="/auth/login"
+                  href="/login"
                   className="inline-flex w-full items-center justify-center gap-2 bg-[#0F9D58] hover:bg-[#0D7F48] text-white font-semibold py-3 px-4 rounded-lg transition-colors"
                 >
                   Go to sign in

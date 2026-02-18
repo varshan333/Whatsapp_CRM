@@ -47,16 +47,16 @@ export default function LoginPage() {
 
     try {
       // Call backend API
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      // const res = await fetch("/api/auth/login", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ email, password }),
+      // });
 
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || res.statusText || "Login failed");
-      }
+      // if (!res.ok) {
+      //   const errorData = await res.json().catch(() => ({}));
+      //   throw new Error(errorData.message || res.statusText || "Login failed");
+      // }
       // Redirect to dashboard after login
       window.location.href = "/dashboard";
     } catch (error) {
@@ -207,7 +207,7 @@ export default function LoginPage() {
                       Password
                     </label>
                     <Link
-                      href="/auth/forgot-password"
+                      href="/forgot-password"
                       className="text-sm font-medium text-[#0F9D58] hover:text-[#0F9D58]/80 transition-colors"
                     >
                       Forgot?
@@ -285,7 +285,7 @@ export default function LoginPage() {
 
                 {/* Sign up link */}
                 <Link
-                  href="/auth/signup"
+                  href="/signup"
                   className="w-full border border-slate-300 hover:border-[#0F9D58] text-slate-700 hover:text-[#0F9D58] font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
                 >
                   Create an account

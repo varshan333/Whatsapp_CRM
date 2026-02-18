@@ -34,11 +34,11 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      await fetch("/api/auth/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      }).catch(() => null);
+      // await fetch("/api/auth/forgot-password", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ email }),
+      // }).catch(() => null);
       setIsSubmitted(true);
     } catch (_error) {
       setErrors({ email: "Failed to send reset link. Please try again." });
@@ -121,7 +121,7 @@ export default function ForgotPasswordPage() {
 
               {/* Back to login */}
               <Link
-                href="/auth/login"
+                href="/login"
                 className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-[#0F9D58] hover:text-[#0D7F48] transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -175,7 +175,7 @@ export default function ForgotPasswordPage() {
                 </button>
 
                 <Link
-                  href="/auth/login"
+                  href="/login"
                   className="block text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
                 >
                   Back to sign in
