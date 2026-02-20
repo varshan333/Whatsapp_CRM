@@ -23,15 +23,13 @@ async function isAuthenticated(_req: NextRequest) {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   await connectDB();
   if (!(await isAuthenticated(req)))
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // Note: params is a promise in recent Next.js versions but handled by framework in App Router for strict dynamic routes
-  // For safety in diverse Next.js versions, we await if necessary, but params is usually object here
-  const { id } = await (params as any);
+  const { id } = await params;
 
   const lead = await Lead.findById(id).exec();
   if (!lead) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -40,13 +38,13 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   await connectDB();
   if (!(await isAuthenticated(req)))
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { id } = await (params as any);
+  const { id } = await params;
   const updates = await req.json();
   const lead = await Lead.findByIdAndUpdate(id, updates, { new: true }).exec();
   if (!lead) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -57,13 +55,13 @@ export async function PUT(
 // TODO: fix delete authorization to check for admin role
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   await connectDB();
   if (!(await isAuthenticated(req)))
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { id } = await (params as any);
+  const { id } = await params;
   await Lead.findByIdAndDelete(id).exec();
   return NextResponse.json({ message: "Deleted" });
 }
